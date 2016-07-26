@@ -1,46 +1,43 @@
 
-## Setup
-
-### Docker for OSX
-
-```sh
-docker-machine create --driver virtualbox default
-docker-machine ls
-docker-machine env default
-eval "$(docker-machine env default)"
-docker run hello-world
-```
-
-## Start daemon
+## Start daemon (if stopped)
 
 ### OSX
 
+open Docker app
+
+### Linux
+
+#### w/ SystemD
+
+sudo systemctl start docker
+
+#### w/ Upstart
+
+sudo [status/start/stop/restart] docker
+
+## Build image
+
 ```sh
-## docker-machine start default?
-docker-machine env default ## if different ip? or just do this?
+name="notebook"
+
+# from directory containing target 'Dockerfile'
+docker build -t $name .
 ```
 
-## Run
-
-### OSX local
+## Run container
 
 ```sh
-cid=$(docker run -d -p 8888:8888 jupyter/datascience-notebook)
-host="localhost"
+# On host (local if running locally):
+cid=$(sudo docker run -d -p 8888:8888 $name)
+```
+
+```sh
+# Locally:
+host="localhost" # or host name if not local
 open "http://$host:8888"
 ```
 
-### w/ Docker on Linux
-
-```sh
-# SSH'd into server:
-cid=$(docker run -d -p 8888:8888 jupyter/datascience-notebook)
-# Locally
-host="[myserver]"
-open "http://$host:8888"
-```
-
-## Modify (install packages in) running container
+## Modify running container
 
 ### Pull up container terminal
 
@@ -56,9 +53,8 @@ open "http://$host:8888"
 # select 'New' (dropdown) -> 'Terminal'
 ```
 
-### Run install commands in container terminal
-```sh
-pip3 install feather-format
-Rscript -e 'install.packages("feather", repos="http://cloud.r-project.org")'
-Rscript -e 'install.packages("nycflights13", repos="http://cloud.r-project.org")'
-```
+### Enter commands
+
+e.g.
+`pip3 install feather-format`
+`pip freeze -r requirements.txt`
